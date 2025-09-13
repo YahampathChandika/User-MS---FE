@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,7 +53,6 @@ export default function UserForm({
   // UI state
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [touched, setTouched] = useState({});
 
@@ -162,11 +162,6 @@ export default function UserForm({
       [name]: value,
     }));
 
-    // Clear success message when user starts editing
-    if (success) {
-      setSuccess(false);
-    }
-
     // Validate field if it has been touched
     if (touched[name]) {
       const error = validateField(name, value);
@@ -209,6 +204,7 @@ export default function UserForm({
 
     // Stop if there are validation errors
     if (Object.keys(formErrors).length > 0) {
+      toast.error("Please fix the validation errors before submitting");
       return;
     }
 
@@ -224,16 +220,28 @@ export default function UserForm({
       let result;
       if (isEditMode) {
         result = await updateUser(user.id, apiData);
+        toast.success("User updated successfully!", {
+          description: `${formData.name} has been updated`,
+          action: {
+            label: "View Users",
+            onClick: () => router.push("/users"),
+          },
+        });
       } else {
         result = await createUser(apiData);
+        toast.success("User created successfully!", {
+          description: `${formData.name} has been added to the system`,
+          action: {
+            label: "View Users",
+            onClick: () => router.push("/users"),
+          },
+        });
       }
 
       console.log(
         `User ${isEditMode ? "updated" : "created"} successfully:`,
         result
       );
-
-      setSuccess(true);
 
       // Call success callback or redirect
       if (onSuccess) {
@@ -250,17 +258,23 @@ export default function UserForm({
         error
       );
 
-      // Handle server validation errors
+      // Handle server validation errors with specific toasts
       if (error.message.includes("email already exists")) {
         setErrors((prev) => ({
           ...prev,
           email: "A user with this email already exists",
         }));
+        toast.error("Email already exists", {
+          description: "A user with this email address is already registered",
+        });
       } else if (error.message.includes("mobile number")) {
         setErrors((prev) => ({
           ...prev,
           mobileNumber: "A user with this mobile number already exists",
         }));
+        toast.error("Mobile number already exists", {
+          description: "A user with this mobile number is already registered",
+        });
       } else {
         // Generic error
         setErrors((prev) => ({
@@ -269,18 +283,41 @@ export default function UserForm({
             error.message ||
             `Failed to ${isEditMode ? "update" : "create"} user`,
         }));
+        toast.error(`Failed to ${isEditMode ? "update" : "create"} user`, {
+          description: error.message || "An unexpected error occurred",
+        });
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle cancel
+  // Handle cancel with confirmation if there are unsaved changes
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
+    if (hasChanges()) {
+      toast("Unsaved changes detected", {
+        description: "Are you sure you want to leave without saving?",
+        action: {
+          label: "Leave anyway",
+          onClick: () => {
+            if (onCancel) {
+              onCancel();
+            } else {
+              router.push("/users");
+            }
+          },
+        },
+        cancel: {
+          label: "Continue editing",
+          onClick: () => {},
+        },
+      });
     } else {
-      router.push("/users");
+      if (onCancel) {
+        onCancel();
+      } else {
+        router.push("/users");
+      }
     }
   };
 
@@ -306,23 +343,6 @@ export default function UserForm({
 
   return (
     <div className={cn("w-full max-w-2xl mx-auto", className)}>
-      {/* Success Message */}
-      {success && (
-        <Card className="mb-6 border-green-200 bg-green-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-green-700">
-              <CheckCircleIcon className="h-5 w-5" />
-              <span className="font-medium">
-                User {isEditMode ? "updated" : "created"} successfully!
-              </span>
-            </div>
-            <p className="text-sm text-green-600 mt-1">
-              {onSuccess ? "" : "Redirecting to users list..."}
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Form Card */}
       <Card>
         <CardHeader>
@@ -540,7 +560,7 @@ export default function UserForm({
             </div>
 
             {/* Unsaved Changes Warning */}
-            {hasChanges() && !loading && !success && (
+            {hasChanges() && !loading && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-amber-700">
                   <AlertCircleIcon className="h-4 w-4" />

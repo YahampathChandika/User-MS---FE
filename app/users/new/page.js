@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, UserPlusIcon } from "lucide-react";
 import UserForm from "@/components/UserForm";
+import { toast } from "sonner";
 
 export default function AddUserPage() {
   const router = useRouter();
@@ -13,25 +14,39 @@ export default function AddUserPage() {
   const handleSuccess = (result) => {
     console.log("User created successfully:", result);
 
-    // Show success message and redirect to users list
-    // The UserForm component will handle the success message display
-    // and auto-redirect after 1.5 seconds
+    // Success toast with redirect notification
+    toast.success("Redirecting to users list...", {
+      description: "New user has been created successfully",
+    });
+
+    // Auto-redirect after 1.5 seconds
+    setTimeout(() => {
+      router.push("/users");
+    }, 1500);
   };
 
   // Handle form cancellation
   const handleCancel = () => {
-    // Confirm if user wants to leave without saving
-    const hasUnsavedChanges = false; // UserForm will handle this internally
+  // Check if form has unsaved changes (this would need to be passed from UserForm)
+  // For now, we'll use a simple confirmation
+  const hasChanges = false; // UserForm will handle this internally
 
-    if (hasUnsavedChanges) {
-      const confirmLeave = window.confirm(
-        "Are you sure you want to leave? Any unsaved changes will be lost."
-      );
-      if (!confirmLeave) return;
-    }
-
+  if (hasChanges) {
+    toast("Unsaved changes detected", {
+      description: "Are you sure you want to leave without saving?",
+      action: {
+        label: "Leave anyway",
+        onClick: () => router.push("/users"),
+      },
+      cancel: {
+        label: "Continue editing",
+        onClick: () => {},
+      },
+    });
+  } else {
     router.push("/users");
-  };
+  }
+};
 
   return (
     <div className="container mx-auto p-6">

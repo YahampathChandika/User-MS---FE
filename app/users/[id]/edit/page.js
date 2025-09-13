@@ -21,6 +21,7 @@ import {
 import { format } from "date-fns";
 import UserForm from "@/components/UserForm";
 import { getUserById } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function EditUserPage() {
   const router = useRouter();
@@ -46,8 +47,20 @@ export default function EditUserPage() {
       console.error("Error fetching user:", err);
       setError(err.message || "Failed to fetch user data");
 
+      // Error toast
+      toast.error("Failed to load user", {
+        description: err.message || "Unable to fetch user data",
+        action: {
+          label: "Try again",
+          onClick: () => fetchUser(),
+        },
+      });
+
       // If user not found, redirect to users list after showing error
       if (err.message.includes("not found") || err.message.includes("404")) {
+        toast.error("User not found", {
+          description: "Redirecting to users list...",
+        });
         setTimeout(() => {
           router.push("/users");
         }, 3000);
@@ -68,8 +81,15 @@ export default function EditUserPage() {
   const handleSuccess = (result) => {
     console.log("User updated successfully:", result);
 
-    // The UserForm component will handle the success message display
-    // and auto-redirect after 1.5 seconds
+    // Success toast with redirect notification
+    toast.success("Redirecting to users list...", {
+      description: "User has been updated successfully",
+    });
+
+    // Auto-redirect after 1.5 seconds
+    setTimeout(() => {
+      router.push("/users");
+    }, 1500);
   };
 
   // Handle form cancellation

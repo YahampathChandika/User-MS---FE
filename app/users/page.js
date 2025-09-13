@@ -11,6 +11,7 @@ import SearchFilters from "@/components/SearchFilters";
 import UserTable from "@/components/UserTable";
 import PaginationControls from "@/components/PaginationControls";
 import { getUsers } from "@/lib/api";
+import { toast } from "sonner";
 export default function UsersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,12 +67,28 @@ export default function UsersPage() {
         setUsers(result.users || []);
         setPagination(result.pagination || {});
 
+        // Success toast for manual refresh
+        if (showRefreshIndicator) {
+          toast.success("Users refreshed successfully", {
+            description: `Found ${result.pagination?.totalItems || 0} users`,
+          });
+        }
+
         console.log("Users fetched successfully:", result);
       } catch (err) {
         console.error("Error fetching users:", err);
         setError(err.message || "Failed to fetch users");
         setUsers([]);
         setPagination({});
+
+        // Error toast
+        toast.error("Failed to load users", {
+          description: err.message || "Unable to fetch user data",
+          action: {
+            label: "Retry",
+            onClick: () => fetchUsers(true),
+          },
+        });
       } finally {
         setLoading(false);
         setRefreshing(false);

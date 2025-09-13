@@ -39,6 +39,7 @@ import {
 import { format } from "date-fns";
 import { deleteUser } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function UserTable({
   users = [],
@@ -87,27 +88,39 @@ export default function UserTable({
   };
 
   const confirmDelete = async () => {
-    if (!userToDelete) return;
+  if (!userToDelete) return;
 
-    setDeleting(true);
-    try {
-      await deleteUser(userToDelete.id);
+  setDeleting(true);
+  try {
+    await deleteUser(userToDelete.id);
 
-      // Notify parent component
-      if (onUserDeleted) {
-        onUserDeleted(userToDelete.id);
-      }
+    // Success toast
+    toast.success("User deleted successfully", {
+      description: `${userToDelete.name} has been removed from the system`,
+    });
 
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      // You could add toast notification here
-      alert(`Error deleting user: ${error.message}`);
-    } finally {
-      setDeleting(false);
+    // Notify parent component
+    if (onUserDeleted) {
+      onUserDeleted(userToDelete.id);
     }
-  };
+
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    
+    // Error toast instead of alert
+    toast.error("Failed to delete user", {
+      description: error.message || "An unexpected error occurred",
+      action: {
+        label: "Try again",
+        onClick: () => confirmDelete(),
+      },
+    });
+  } finally {
+    setDeleting(false);
+  }
+};
 
   // Format date for display
   const formatDate = (dateString) => {
