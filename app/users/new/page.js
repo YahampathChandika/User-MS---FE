@@ -15,9 +15,7 @@ export default function AddUserPage() {
     console.log("User created successfully:", result);
 
     // Success toast with redirect notification
-    toast.success("Redirecting to users list...", {
-      description: "New user has been created successfully",
-    });
+    toast.success("New user has been created successfully");
 
     // Auto-redirect after 1.5 seconds
     setTimeout(() => {
@@ -27,26 +25,26 @@ export default function AddUserPage() {
 
   // Handle form cancellation
   const handleCancel = () => {
-  // Check if form has unsaved changes (this would need to be passed from UserForm)
-  // For now, we'll use a simple confirmation
-  const hasChanges = false; // UserForm will handle this internally
+    // Check if form has unsaved changes (this would need to be passed from UserForm)
+    // For now, we'll use a simple confirmation
+    const hasChanges = false; // UserForm will handle this internally
 
-  if (hasChanges) {
-    toast("Unsaved changes detected", {
-      description: "Are you sure you want to leave without saving?",
-      action: {
-        label: "Leave anyway",
-        onClick: () => router.push("/users"),
-      },
-      cancel: {
-        label: "Continue editing",
-        onClick: () => {},
-      },
-    });
-  } else {
-    router.push("/users");
-  }
-};
+    if (hasChanges) {
+      toast("Unsaved changes detected", {
+        description: "Are you sure you want to leave without saving?",
+        action: {
+          label: "Leave anyway",
+          onClick: () => router.push("/users"),
+        },
+        cancel: {
+          label: "Continue editing",
+          onClick: () => {},
+        },
+      });
+    } else {
+      router.push("/users");
+    }
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -68,35 +66,6 @@ export default function AddUserPage() {
             </p>
           </div>
         </div>
-
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link
-            href="/users"
-            className="hover:text-foreground transition-colors"
-          >
-            Users
-          </Link>
-          <span>&gt;</span>
-          <span className="text-foreground">Add New User</span>
-        </nav>
-      </div>
-
-      {/* Instructions */}
-      <div className="mb-6 bg-muted/50 border rounded-lg p-4">
-        <h2 className="text-sm font-medium mb-2">Instructions:</h2>
-        <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• All fields marked with * are required</li>
-          <li>• Email addresses must be unique in the system</li>
-          <li>
-            • Mobile numbers should include country code for international
-            numbers
-          </li>
-          <li>
-            • About You section should be descriptive (minimum 10 characters)
-          </li>
-          <li>• Birthday cannot be in the future</li>
-        </ul>
       </div>
 
       {/* User Form */}
@@ -105,20 +74,6 @@ export default function AddUserPage() {
         onSuccess={handleSuccess}
         onCancel={handleCancel}
       />
-
-      {/* Footer Help */}
-      <div className="mt-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          Need help? Check our{" "}
-          <Link href="#" className="text-primary hover:underline">
-            user management guide
-          </Link>{" "}
-          or{" "}
-          <Link href="#" className="text-primary hover:underline">
-            contact support
-          </Link>
-        </p>
-      </div>
     </div>
   );
 }

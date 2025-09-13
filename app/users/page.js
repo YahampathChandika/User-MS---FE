@@ -67,13 +67,6 @@ export default function UsersPage() {
         setUsers(result.users || []);
         setPagination(result.pagination || {});
 
-        // Success toast for manual refresh
-        if (showRefreshIndicator) {
-          toast.success("Users refreshed successfully", {
-            description: `Found ${result.pagination?.totalItems || 0} users`,
-          });
-        }
-
         console.log("Users fetched successfully:", result);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -188,7 +181,6 @@ export default function UsersPage() {
           </Button>
         </div>
       </div>
-
       {/* Stats Summary */}
       <Card>
         <CardContent className="pt-4">
@@ -231,10 +223,8 @@ export default function UsersPage() {
           </div>
         </CardContent>
       </Card>
-
       {/* Search & Filters */}
       <SearchFilters onFiltersChange={handleFiltersChange} />
-
       {/* Error Display */}
       {error && (
         <Card className="border-destructive">
@@ -252,7 +242,6 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       )}
-
       {/* Users Table */}
       <UserTable
         users={users}
@@ -263,46 +252,12 @@ export default function UsersPage() {
         onSort={handleSort}
         onUserDeleted={handleUserDeleted}
       />
-
       {/* Pagination Controls */}
       <PaginationControls
         pagination={pagination}
         onPageChange={handlePageChange}
         onLimitChange={handleLimitChange}
       />
-
-      {/* Debug Info (remove in production) */}
-      {process.env.NODE_ENV === "development" && (
-        <Card className="bg-muted">
-          <CardHeader>
-            <CardTitle className="text-sm">Debug Info (Dev Only)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs space-y-2">
-              <div>
-                <strong>Current URL Params:</strong>
-              </div>
-              <div className="bg-background p-2 rounded text-xs font-mono overflow-auto">
-                {searchParams.toString() || "No parameters"}
-              </div>
-
-              <div>
-                <strong>API Filters:</strong>
-              </div>
-              <div className="bg-background p-2 rounded text-xs font-mono overflow-auto">
-                {JSON.stringify(getCurrentParams().filters, null, 2)}
-              </div>
-
-              <div>
-                <strong>Pagination State:</strong>
-              </div>
-              <div className="bg-background p-2 rounded text-xs font-mono overflow-auto">
-                {JSON.stringify(pagination, null, 2)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

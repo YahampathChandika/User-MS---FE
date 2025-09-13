@@ -81,10 +81,8 @@ export default function EditUserPage() {
   const handleSuccess = (result) => {
     console.log("User updated successfully:", result);
 
-    // Success toast with redirect notification
-    toast.success("Redirecting to users list...", {
-      description: "User has been updated successfully",
-    });
+    // Success toast with redirect notification;
+    toast.success("User has been updated successfully");
 
     // Auto-redirect after 1.5 seconds
     setTimeout(() => {
@@ -241,20 +239,6 @@ export default function EditUserPage() {
           </div>
           <Badge variant="outline">ID: {user?.id}</Badge>
         </div>
-
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link
-            href="/users"
-            className="hover:text-foreground transition-colors"
-          >
-            Users
-          </Link>
-          <span>&gt;</span>
-          <span className="text-foreground">{user?.name}</span>
-          <span>&gt;</span>
-          <span className="text-foreground">Edit</span>
-        </nav>
       </div>
 
       {/* Current User Info Summary */}
@@ -301,18 +285,6 @@ export default function EditUserPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Instructions */}
-      <div className="mb-6 bg-muted/50 border rounded-lg p-4">
-        <h2 className="text-sm font-medium mb-2">Editing Instructions:</h2>
-        <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• Modify any field you want to update</li>
-          <li>• All fields marked with * are required</li>
-          <li>• Email addresses must be unique in the system</li>
-          <li>• Only changed fields will be updated</li>
-          <li>• Click "Update User" to save your changes</li>
-        </ul>
-      </div>
 
       {/* Edit Form */}
       <UserForm
