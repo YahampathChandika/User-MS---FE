@@ -10,8 +10,7 @@ import { PlusIcon, UsersIcon, RefreshCwIcon } from "lucide-react";
 import SearchFilters from "@/components/SearchFilters";
 import UserTable from "@/components/UserTable";
 import PaginationControls from "@/components/PaginationControls";
-import { getUsers, formatDateForAPI } from "@/lib/api";
-
+import { getUsers } from "@/lib/api";
 export default function UsersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
