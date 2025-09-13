@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -15,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   CalendarIcon,
+  ChevronDownIcon,
   SaveIcon,
   XIcon,
   UserIcon,
@@ -450,38 +452,54 @@ export default function UserForm({
               )}
             </div>
 
-            {/* Birthday Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+            {/* Birthday Field - NEW CALENDAR IMPLEMENTATION */}
+            <div className="space-y-3">
+              <Label
+                htmlFor="birthday"
+                className="text-sm font-medium flex items-center gap-2"
+              >
                 <CalendarIcon className="h-4 w-4" />
-                Birthday *
-              </label>
+                Date of birth *
+              </Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
+                    id="birthday"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-between font-normal",
                       !formData.birthday && "text-muted-foreground",
                       errors.birthday && "border-red-500"
                     )}
                     disabled={loading}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.birthday ? (
-                      format(formData.birthday, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
+                    {formData.birthday
+                      ? formData.birthday.toLocaleDateString()
+                      : "Select date"}
+                    <ChevronDownIcon className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent
+                  className="w-auto overflow-hidden p-0"
+                  align="start"
+                >
                   <Calendar
                     mode="single"
                     selected={formData.birthday}
+                    captionLayout="dropdown"
                     onSelect={(date) => {
-                      handleInputChange("birthday", date);
-                      handleBlur("birthday");
+                      if (date) {
+                        handleInputChange("birthday", date);
+                        // Clear the birthday error immediately when a date is selected
+                        setErrors((prev) => ({
+                          ...prev,
+                          birthday: "",
+                        }));
+                        setTouched((prev) => ({
+                          ...prev,
+                          birthday: true,
+                        }));
+                      }
                       setCalendarOpen(false);
                     }}
                     disabled={(date) => date > new Date()}
